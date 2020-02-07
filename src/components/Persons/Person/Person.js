@@ -1,8 +1,13 @@
-import React from 'react';
+import React, { Component } from 'react';
 
 // import Radium from 'radium';
 
 import classes from './Person.module.css';
+
+import Aux from '../../../hoc/Auxillary';
+import withClass from '../../../hoc/withClass';
+
+import PropTypes from 'prop-types';
 
 // import styled from 'styled-components';
 
@@ -18,23 +23,70 @@ import classes from './Person.module.css';
 //     }
 // `;
 
-const person = (props) => {
-    // const style = {
-    //     '@media (min-width: 500px)' : {
-    //         width : '450px'
-    //     }
-    // }
+class Person extends Component {
 
-    return (
-        <div className={classes.Person}>
-        {/* <StyledDiv> */}
-            <p onClick={props.click}>My name is {props.name} and I'm {props.age} years old.</p>
-            <p>{props.children}</p>
-            <input type="text" onChange={props.changed} value={props.name} />
-        {/* </StyledDiv> */}
-        </div>
-    );
+    constructor(props) {
+        super(props);
+        this.inputElement = React.createRef(); // new way after react 16.3 
+    }
+
+    render() {
+        console.log('Person render!!!')
+        // return [  Rendering Adjacent JsX elements(one way of doing so)
+        //     // <div className={classes.Person}>
+        //         <p key="i1" onClick={this.props.click}>My name is {this.props.name} and I'm {this.props.age} years old.</p>,
+        //         <p key="i2">{this.props.children}</p>,
+        //         <input key="i3" type="text" onChange={this.props.changed} value={this.props.name} />
+        //     // </div>
+        // ];
+        return (
+            <Aux>
+                <p onClick={this.props.click}>My name is {this.props.name} and I'm {this.props.age} years old.</p>
+                <p>{this.props.children}</p>
+                <input
+                type="text"
+                // ref={(inputEl) => { this.inputElement = inputEl }}  Old way
+                ref={this.inputElement}
+                onChange={this.props.changed}
+                value={this.props.name} />
+            </Aux>
+        );
+        // We can replace Aux by React.Fragment(inbuilt feature) or we can 
+        // import { Fragment } and replace Aux by just Fragment which does
+        // the same work as our Aux behind the scenes
+    }
+
+    componentDidMount() {
+        // this.inputElement.focus(); // old way
+        this.inputElement.current.focus(); // new way
+    }
 }
 
+Person.propTypes = {
+    click : PropTypes.func,
+    name : PropTypes.string,
+    age : PropTypes.number,
+    changed :  PropTypes.func
+};
+
+// const person = (props) => {
+//     // const style = {
+//     //     '@media (min-width: 500px)' : {
+//     //         width : '450px'
+//     //     }
+//     // }
+//     console.log('Person render!!!')
+//     return (
+//         <div className={classes.Person}>
+//         {/* <StyledDiv> */}
+//             <p onClick={props.click}>My name is {props.name} and I'm {props.age} years old.</p>
+//             <p>{props.children}</p>
+//             <input type="text" onChange={props.changed} value={props.name} />
+//         {/* </StyledDiv> */}
+//         </div>
+//     );
+// }
+
 // export default Radium(person);
-export default person;
+// export default person;
+export default withClass(Person, classes.Person);

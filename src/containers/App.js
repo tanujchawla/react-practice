@@ -5,8 +5,9 @@ import classes from './App.module.css';
 
 // import Person from '../components/Persons/Persons/Person';
 import Persons from '../components/Persons/Persons';
-
 import Cockpit from '../components/Cockpit/Cockpit';
+import withClass from '../hoc/withClass';
+import Aux from '../hoc/Auxillary';
 
 // import ErrorBoundary from '../components/ErrorBoundary/ErrorBoundary';
 
@@ -26,15 +27,47 @@ import Cockpit from '../components/Cockpit/Cockpit';
 // `;
 
 class App extends Component {
+
+  constructor(props) {
+    super(props);
+    console.log('App constructor!!!');
+  }
+
   state = {
     persons : [
-      { id : 'acnck', name : 'Max', age : '28'},
-      { id : 'csdsl', name : 'Steve', age : '24'},
-      { id : 'cknsd', name : 'Grey', age : '26'}
+      { id : 'acnck', name : 'Max', age : 28},
+      { id : 'csdsl', name : 'Steve', age : 24},
+      { id : 'cknsd', name : 'Grey', age : 26}
     ],
     other_state : 'Some other value!',
-    showPersons : false
+    showPersons : false,
+    showCockpit : true,
+    changeCounter : 0
   };
+
+  static getDerivedStateFromProps(props) {
+    console.log('getDerivedState:::', props);
+    return null;
+  }
+
+  componentDidMount() {
+    console.log('Component did mount!!!');
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    console.log('Update--App---shouldComponentUpdate');
+    return true;
+  }
+
+  getSnapshotBeforeUpdate(prevProps, prevState) {
+      console.log('Update--App--getSnapshot');
+      return { message : 'Snapshot!'};
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+      console.log('Snapshot::::', snapshot);
+      console.log('Update-App-ComponentDidUpdate');
+  }
 
   switchNameHandler = (newName) => {
     console.log('Switch!!!');
@@ -57,8 +90,20 @@ class App extends Component {
 
     persons[personIndex] = person;
 
-    this.setState({
-      persons : persons
+    ////// Wrong way to update state when state is dependent on prev state
+    ////// as this way state is not updated immediately
+
+    // this.setState({
+    //   persons : persons,
+    //   changeCounter : this.state.changeCounter + 1
+    // });
+
+    /////// Right Way
+    this.setState((prevState, props) => {
+      return {
+        persons : persons,
+        changeCounter : prevState.changeCounter + 1
+      };
     });
   }
 
@@ -76,7 +121,15 @@ class App extends Component {
     });
   }
 
+  toggleCockpit = () => {
+    this.setState({
+      showCockpit : !this.state.showCockpit
+    });
+  }
+
   render() {
+
+    console.log('Render!!!');
 
     // const style = {
     //   backgroundColor : 'green',
@@ -125,12 +178,15 @@ class App extends Component {
 
     return (
       // <StyleRoot>
-      <div className={classes.App}>
-        <Cockpit 
-          persons={this.state.persons}
+      // <WithClass classes={classes.App}>
+      <Aux>
+        <button onClick={this.toggleCockpit}>Toggle Cockpit</button>
+        { this.state.showCockpit ? <Cockpit 
+          personsLength={this.state.persons.length}
+          title={this.props.appTitle}
           showPersons={this.state.showPersons}
           clicked={this.togglePersonHandler}
-        />
+        /> : null}
         {/* <h1>Hi, I'm a React App :)</h1> */}
         {/* <p className={assignedClasses.join(' ')}>It's working!</p> */}
         {/* <button style={style} onClick={this.switchNameHandler.bind(this, 'Maxxx')}>Switch Name</button> */}
@@ -146,11 +202,12 @@ class App extends Component {
           changed={this.nameChangedHandler} >
             My hobbies : Racing!</Person>
         </div> : null } */}
-      </div>
+      {/* </WithClass> */}
+      </Aux>
       /* </StyleRoot> */
     );
   }
 }
 
-export default App;
+export default withClass(App, classes.App);
 // export default Radium(App);
