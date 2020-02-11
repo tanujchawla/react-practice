@@ -9,6 +9,8 @@ import withClass from '../../../hoc/withClass';
 
 import PropTypes from 'prop-types';
 
+import AuthContext from '../../../context/auth-context';
+
 // import styled from 'styled-components';
 
 // const StyledDiv = styled.div`
@@ -30,6 +32,8 @@ class Person extends Component {
         this.inputElement = React.createRef(); // new way after react 16.3 
     }
 
+    static contextType = AuthContext;
+
     render() {
         console.log('Person render!!!')
         // return [  Rendering Adjacent JsX elements(one way of doing so)
@@ -41,6 +45,10 @@ class Person extends Component {
         // ];
         return (
             <Aux>
+                {/* <AuthContext.Consumer> */}
+                    {/* {(context) => context.authenticated  ? <p>Authenicated!</p> : <p>Please log in.</p>} */}
+                {/* </AuthContext.Consumer> */}
+                {this.context.authenticated  ? <p>Authenicated!</p> : <p>Please log in.</p>}
                 <p onClick={this.props.click}>My name is {this.props.name} and I'm {this.props.age} years old.</p>
                 <p>{this.props.children}</p>
                 <input
@@ -59,6 +67,7 @@ class Person extends Component {
     componentDidMount() {
         // this.inputElement.focus(); // old way
         this.inputElement.current.focus(); // new way
+        console.log('context:::', this.context.authenticated);
     }
 }
 

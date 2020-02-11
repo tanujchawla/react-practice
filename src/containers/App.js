@@ -8,6 +8,7 @@ import Persons from '../components/Persons/Persons';
 import Cockpit from '../components/Cockpit/Cockpit';
 import withClass from '../hoc/withClass';
 import Aux from '../hoc/Auxillary';
+import AuthContext from '../context/auth-context';
 
 // import ErrorBoundary from '../components/ErrorBoundary/ErrorBoundary';
 
@@ -42,7 +43,8 @@ class App extends Component {
     other_state : 'Some other value!',
     showPersons : false,
     showCockpit : true,
-    changeCounter : 0
+    changeCounter : 0,
+    authenticated : false
   };
 
   static getDerivedStateFromProps(props) {
@@ -76,6 +78,12 @@ class App extends Component {
         { name : newName, age : '28'},
         { name : 'Steve', age : '26'}
       ]
+    });
+  }
+
+  loginHandler = () => {
+    this.setState({
+      authenticated : true
     });
   }
 
@@ -181,6 +189,9 @@ class App extends Component {
       // <WithClass classes={classes.App}>
       <Aux>
         <button onClick={this.toggleCockpit}>Toggle Cockpit</button>
+        {/* changes in context would not recall the render cycle,
+            it re-renders when the state or props change*/}
+        <AuthContext.Provider value={{authenticated : this.state.authenticated, login : this.loginHandler}}>
         { this.state.showCockpit ? <Cockpit 
           personsLength={this.state.persons.length}
           title={this.props.appTitle}
@@ -192,7 +203,7 @@ class App extends Component {
         {/* <button style={style} onClick={this.switchNameHandler.bind(this, 'Maxxx')}>Switch Name</button> */}
         {/* <button className={btnClasses} onClick={this.togglePersonHandler}>Toggle Persons</button> */}
         {/* <StyledButton alt={this.state.showPersons} onClick={this.togglePersonHandler}>Toggle Persons</StyledButton> */}
-        {persons}
+        {persons}</AuthContext.Provider>
         {/* { this.state.showPersons  ?
           <div>
           <Person name={this.state.persons[0].name} age={this.state.persons[0].age} />
